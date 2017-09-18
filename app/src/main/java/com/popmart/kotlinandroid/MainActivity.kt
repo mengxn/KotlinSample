@@ -8,7 +8,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_main.view.*
 import org.jetbrains.anko.AnkoLogger
@@ -23,35 +22,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger{
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.addItemDecoration(DivideDecoration())
+        recyclerView.addOnScrollListener(StickyItemScrollListener())
         var contentAdapter = ContentAdapter()
         recyclerView.adapter = contentAdapter
         contentAdapter.setData((0..20).map {"%d >> %s".format(it, DEFAULT_TEXT)})
 
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-
-            var lastPosition = 0
-
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val linearLayoutManager = recyclerView?.layoutManager as LinearLayoutManager
-                val position = linearLayoutManager.findLastVisibleItemPosition()
-                if (lastPosition == position) {
-                    return
-                }
-                // 向下滑动时，不支持动画
-                if (lastPosition > position) {
-                    lastPosition = position
-                    return
-                }
-                lastPosition = position
-                val holder = recyclerView.findViewHolderForAdapterPosition(position)
-                holder.itemView.translationY = 100f
-                val animate = holder.itemView.animate()
-                val animator = animate.translationY(0f).setDuration(500).setStartDelay(200)
-                animator.interpolator = DecelerateInterpolator()
-                animate.start()
-            }
-        })
     }
 
     class ContentAdapter : RecyclerView.Adapter<ContentAdapter.ContentViewHolder>(), AnkoLogger {
