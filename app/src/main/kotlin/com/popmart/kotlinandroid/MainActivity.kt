@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_main.view.*
 import org.jetbrains.anko.AnkoLogger
@@ -23,33 +21,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger{
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.addItemDecoration(DivideDecoration())
         recyclerView.addOnScrollListener(StickyItemScrollListener())
-        var contentAdapter = ContentAdapter()
+        val dataList = (0..20).map { "%d >> %s".format(it, DEFAULT_TEXT) }.toMutableList()
+        val contentAdapter = BaseAdapter<String>(R.layout.item_main, dataList){view, s ->
+            view.contentTv.text = s
+            view.timeTv.text = "2017-09-17 23:30:00".toDefaultFormattedTime()
+        }
         recyclerView.adapter = contentAdapter
-        contentAdapter.setData((0..20).map {"%d >> %s".format(it, DEFAULT_TEXT)})
 
-    }
-
-    class ContentAdapter : RecyclerView.Adapter<ContentAdapter.ContentViewHolder>(), AnkoLogger {
-
-        private var dataList:List<String>? = null
-
-        fun setData(dataList: List<String>) {
-            this.dataList = dataList
-            this.notifyDataSetChanged()
-        }
-
-        override fun getItemCount(): Int = dataList?.size ?: 0
-
-        override fun onBindViewHolder(holder: ContentViewHolder?, position: Int) {
-            holder?.let { it.itemView.contentTv.text = dataList?.get(position) }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ContentViewHolder {
-            val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_main, parent, false)
-            return ContentViewHolder(view)
-        }
-
-        class ContentViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView)
     }
 
     class DivideDecoration : RecyclerView.ItemDecoration() {
