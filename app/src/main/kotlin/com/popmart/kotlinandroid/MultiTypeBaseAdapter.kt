@@ -8,7 +8,9 @@ import android.view.ViewGroup
 /**
  * Created by mengxn on 2017/9/21.
  */
-class MultiTypeBaseAdapter<T>(private val dataList: MutableList<T> = arrayListOf(), private val typeFactory: ITypeFactory<T>) : RecyclerView.Adapter<BaseViewHolder<T>>() {
+class MultiTypeBaseAdapter<T>(private val dataList: MutableList<T>, private val typeFactory: ITypeFactory<T>) : RecyclerView.Adapter<BaseViewHolder<T>>() {
+
+    constructor(typeFactory: ITypeFactory<T>) : this(arrayListOf(), typeFactory)
 
     private val typeDataArray = SparseArray<ITypeFactory.TypeData>()
 

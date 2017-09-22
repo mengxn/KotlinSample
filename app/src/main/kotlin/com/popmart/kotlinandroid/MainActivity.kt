@@ -28,11 +28,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun initAdapter(): BaseAdapter<String> {
-        val dataList = (0..20).map { "%d >> %s".format(it, DEFAULT_TEXT) }.toMutableList()
-        return BaseAdapter(R.layout.item_main, dataList) { view, s ->
+        val adapter : BaseAdapter<String> = BaseAdapter(R.layout.item_main) { view, s ->
             view.contentTv.text = s
             view.timeTv.text = "2017-09-17 23:30:00".toDefaultFormattedTime()
         }
+        val dataList = (0..20).map { "%d >> %s".format(it, DEFAULT_TEXT) }.toMutableList()
+        adapter.append(dataList)
+        return adapter
     }
 
     private fun initMultiAdapter(): MultiTypeBaseAdapter<String> {
