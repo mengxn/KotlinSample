@@ -8,7 +8,7 @@ import android.view.ViewGroup
 /**
  * Created by mengxn on 2017/9/21.
  */
-class MultiTypeBaseAdapter<T>(private val dataList: MutableList<T>, private val typeFactory: ITypeFactory<T>) : RecyclerView.Adapter<BaseViewHolder<T>>() {
+open class MultiTypeBaseAdapter<T>(private val dataList: MutableList<T>, private val typeFactory: ITypeFactory<T>) : RecyclerView.Adapter<BaseViewHolder<T>>() {
 
     constructor(typeFactory: ITypeFactory<T>) : this(arrayListOf(), typeFactory)
 
@@ -32,6 +32,22 @@ class MultiTypeBaseAdapter<T>(private val dataList: MutableList<T>, private val 
         val typeData = typeFactory.type(dataList[position])
         typeDataArray.put(typeData.type, typeData)
         return typeData.type
+    }
+
+    fun setData(dataList: MutableList<T>) {
+        this.dataList.clear()
+        this.dataList.addAll(dataList)
+        notifyDataSetChanged()
+    }
+
+    fun append(data: T) {
+        dataList.add(data)
+        notifyItemInserted(itemCount)
+    }
+
+    fun append(dataList: List<T>) {
+        this.dataList.addAll(dataList)
+        notifyItemRangeInserted(itemCount - dataList.size, itemCount)
     }
 }
 
