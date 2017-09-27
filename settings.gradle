@@ -1,1 +1,3 @@
-include ':app'
+include ':app', ':multitypebaseadapter'
+
+project(':multitypebaseadapter').projectDir = new File(settingsDir, '../MultiTypeAdapterForKotlin/multitypebaseadapter/')

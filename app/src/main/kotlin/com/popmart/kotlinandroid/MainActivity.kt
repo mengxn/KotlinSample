@@ -8,6 +8,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_main.view.*
+import me.codego.adapter.BaseAdapter
+import me.codego.adapter.BaseViewHolder
+import me.codego.adapter.ITypeFactory
+import me.codego.adapter.MultiTypeBaseAdapter
 import org.jetbrains.anko.AnkoLogger
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
@@ -38,7 +42,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     }
 
     private fun initMultiAdapter(): MultiTypeBaseAdapter<String> {
-        val typeFactory = object : ITypeFactory<String> {
+        val typeFactory = object: ITypeFactory<String> {
 
             override fun type(data: String): ITypeFactory.TypeData {
                 return when (data.subSequence(0, 2).toString().trim().toInt() % 2 + 1) {
