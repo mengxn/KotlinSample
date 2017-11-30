@@ -6,12 +6,13 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.view.WindowManager
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_main.view.*
-import me.codego.adapter.BaseAdapter
-import me.codego.adapter.BaseViewHolder
 import me.codego.adapter.ITypeFactory
-import me.codego.adapter.MultiTypeBaseAdapter
+import me.codego.adapter.MultiAdapter
+import me.codego.adapter.SingleAdapter
+import me.codego.adapter.ViewHolder
 import org.jetbrains.anko.AnkoLogger
 
 class MainActivity : AppCompatActivity(), AnkoLogger {
@@ -21,18 +22,31 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        setContentView(SwipeBackLayout.with(this, R.layout.activity_main).apply {
+            setCallback(object : SwipeBackLayout.Callback{
+                override fun onFinish() {
+                    finish()
+                    overridePendingTransition(0,0)
+                }
+            })
+        })
 
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.addItemDecoration(DivideDecoration())
-        recyclerView.addOnScrollListener(StickyItemScrollListener())
+        setSupportActionBar(toolbar.apply {
+            title = "Hello"
+        })
 
-//        recyclerView.adapter = initAdapter()
-        recyclerView.adapter = initMultiAdapter()
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DivideDecoration())
+            addOnScrollListener(StickyItemScrollListener())
+            // adapter = initAdapter()
+            adapter = initMultiAdapter()
+        }
     }
 
-    private fun initAdapter(): BaseAdapter<String> {
-        val adapter : BaseAdapter<String> = BaseAdapter(R.layout.item_main) { view, s ->
+    private fun initAdapter(): SingleAdapter<String> {
+        val adapter : SingleAdapter<String> = SingleAdapter(R.layout.item_main) { view, s ->
             view.contentTv.text = s
             view.timeTv.text = "2017-09-17 23:30:00".toDefaultFormattedTime()
         }
@@ -41,7 +55,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         return adapter
     }
 
-    private fun initMultiAdapter(): MultiTypeBaseAdapter<String> {
+    private fun initMultiAdapter(): MultiAdapter<String> {
         val typeFactory = object: ITypeFactory<String> {
 
             override fun type(data: String): ITypeFactory.TypeData {
@@ -52,13 +66,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 }
             }
 
-            override fun createViewHolder(view: View, type: Int): BaseViewHolder<String> {
+            override fun createViewHolder(view: View, type: Int): ViewHolder<String> {
                 return when (type) {
-                    1 -> BaseViewHolder(view) { view, s ->
+                    1 -> ViewHolder(view) { view, s ->
                         view.contentTv.text = s
                         view.timeTv.text = "2017-09-17 23:30:00".toDefaultFormattedTime()
                     }
-                    2 -> BaseViewHolder<String>(view) { view, s ->
+                    2 -> ViewHolder<String>(view) { view, s ->
                         view.contentTv.text = s
                     }
                     else -> throw Exception("cannot find viewType")
@@ -66,7 +80,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             }
         }
         val dataList = (0..20).map { "%d >> %s".format(it, if (it%2 == 0) DEFAULT_TEXT else DEFAULT_AD_TEXT) }.toMutableList()
-        return MultiTypeBaseAdapter<String>(dataList, typeFactory)
+        return MultiAdapter<String>(dataList, typeFactory)
     }
 
     class DivideDecoration : RecyclerView.ItemDecoration() {
